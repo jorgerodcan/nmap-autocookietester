@@ -67,7 +67,8 @@ action = function(host, port)
   crawler:set_timeout(10000)
 
   local auth_urls = tab.new(4)
-  tab.addrow(auth_urls, "Cookie", "Vuln. Type", "Vuln. Value", "From")
+  tab.addrow(auth_urls, "Cookie", "Vuln-Type", "Vuln-Value", "From (attributes trimmed)")
+  tab.addrow(auth_urls, "------",  "---------", "----------", "-------------------------")
 
   local cookie_table = {}
   while(true) do
@@ -110,11 +111,8 @@ action = function(host, port)
 	       end
 		-- Loose path attribute
 	       if ( cookie['path'] ) then
-		    -- Path must be in the same host or enclosed in the same path
+		    -- Path must be enclosed in the same path as the url
 		    local isClosed = false
-		    if cookie['path'] == urldata['host'] then
-			isClosed = true
-		    end
 		    if cookie['path'] == urldata['path'] then
 			isClosed = true
 		    end
@@ -126,6 +124,20 @@ action = function(host, port)
 		    	
 		    end
 	       end
+		-- Loose domain attribute
+		if cookie['domain'] then
+			if not (cookie['domain'] == urldata['host']) then
+				
+                 		cookie_table[cookie['name']]['type']['domainNotClosed'] = ("Cookie domain is " .. cookie['domain'])
+                 		cookie_table[cookie['name']]['vuln'] = true
+                 		cookie_table[cookie['name']]['from'][urldata['host']..urldata['path']] = true
+			end
+		else
+                 	cookie_table[cookie['name']]['type']['domainNotClosed'] = ("Cookie domain not specified")
+                 	cookie_table[cookie['name']]['vuln'] = true
+                 	cookie_table[cookie['name']]['from'][urldata['host']..urldata['path']] = true
+		
+		end
           end
         end
      end
@@ -161,6 +173,7 @@ action = function(host, port)
 		indexer = indexer+1
 	   end 
 	end
+	tab.addrow(auth_urls, "","","","")
     end
 
     local result = { tab.dump(auth_urls) }
