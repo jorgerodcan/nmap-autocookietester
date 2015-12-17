@@ -37,7 +37,7 @@ detected method.
 --       domain. This widens the scope from <code>withinhost</code> and can
 --       not be used in combination. (default: false)
 
-author = "UC3M"
+author = "JRC & RLM"
 license = "Same as Nmap--See http://nmap.org/book/man-legal.html"
 categories = {"discovery", "safe"}
 
@@ -73,8 +73,6 @@ action = function(host, port)
   local cookie_table = {}
   while(true) do
     local status, r = crawler:crawl()
-    -- if the crawler fails it can be due to a number of different reasons
-    -- most of them are "legitimate" and should not be reason to abort
     if ( not(status) ) then
       if ( r.err ) then
         return stdnse.format_output(true, ("ERROR: %s"):format(r.reason))
